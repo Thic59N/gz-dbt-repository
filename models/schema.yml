@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw
+    database: bases-sql-485411
+    schema: gz_raw_data
+    loader: bigquery
+    tables:
+      - name: sales #alias
+        identifier: raw_gz_sales
+        description: Vente de gz
+      - name: product #alias
+        identifier: raw_gz_product
+        description: produit de gz
+      - name: ship #alias
+        identifier: raw_gz_ship
+        description: cout de transport de gz
