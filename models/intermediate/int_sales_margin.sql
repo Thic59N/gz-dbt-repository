@@ -18,5 +18,5 @@ ON sales.products_id = product.products_id
 
 SELECT
 *
-,sales.revenue*purchase_cost AS margin
+,sales.revenue - purchase_cost AS margin
 FROM sales
