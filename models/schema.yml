@@ -105,7 +105,20 @@ models:
 
   - name: stg_raw__ship
     description: "Renommage des colonnes de coûts"
-    
+
+  - name: stg_raw__adwords
+    description: "Renommage de l'id des produits"
+
+  - name: stg_raw__bing
+    description: "Renommage de l'id des produits"
+
+  - name: stg_raw__criteo
+    description: "Renommage de l'id des produits"
+
+  - name: stg_raw__facebook
+    description: "Renommage de l'id des produits"
+
+
   # ----------------------------------------------------------------------------
   # B. Modèles Intermédiaires (calculs / aggrégations / jointures nécessaires)
   # ----------------------------------------------------------------------------
@@ -162,3 +175,12 @@ models:
         
       - name: operational_margin
         description: "Marge opérationnelle totale journalière"
+
+
+  # ----------------------------------------------------------------------------
+  # B. Modèles Intermédiaires campaigns (calculs / aggrégations / jointures nécessaires)
+  # ----------------------------------------------------------------------------
+
+  - name: int_campaigns
+  
+    description: "accumulation des ads (adwords + bing + criteo + facebook)"
