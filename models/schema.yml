@@ -1,0 +1,132 @@
+version: 2  #Toujours la version 2, indique à dbt comment lire le fichier
+
+# ==============================================================================
+# 1. SOURCES
+# C'est ici qu'on déclare les données qui existent DÉJÀ dans BigQuery avant dbt.
+# ==============================================================================
+
+
+sources:
+  - name: raw                     # Alias / nom utilisé dans le code : {{ source('raw', 'sales') }}
+    database: bases-sql-485411    # Le vrai nom du dataset dans BigQuery
+    schema: gz_raw_data
+    description: "Données brutes importées de Greenweez"
+    loader: bigquery
+
+     # --- Table 1 : Ventes ---
+    tables:
+      - name: sales       # Alias de la table. 
+        identifier: raw_gz_sales    # ça doit être le vrai nom présent dans Bigquery.
+        description: "Transactions de vente, une ligne par produit par commande"
+        columns:
+          - name: orders_id
+            description: id des ventes dans sales
+        # Tests sur la source : On stoppe en cas de données corrompues dès la source.
+        tests:
+        # La combinaison des clés uniques de la commande + produit doit être unique
+               - unique:
+                  column_name: "(orders_id || '-' || pdt_id)"
+               - not_null:
+                  column_name: "(orders_id || '-' || pdt_id)"
+
+    # --- Table 2 : Produits ---
+      - name: product #alias
+        identifier: raw_gz_product
+        description: produit de gz
+        columns:
+          - name : products_id
+            description: id des produits dans products
+            tests:
+              - unique
+              - not_null
+
+      # --- Table 3 : Livraison ---
+      - name: ship #alias
+        identifier: raw_gz_ship
+        description: cout de transport de gz
+        columns:
+          - name : orders_id
+            description: id des produits dans products
+            tests:
+              - unique
+              - not_null
+
+
+# ==============================================================================
+# 2. MODÈLES
+# Ici, on documente et teste les tables CRÉÉES via dbt (Staging, Int, Marts).
+# Note : L'ordre ici n'importe pas pour dbt, mais c'est mieux pour la lecture.
+# ==============================================================================
+
+models:
+  # ----------------------------------------------------------------------------
+  # A. Modèles de Staging (nettoyage & renommage)
+  # Quasiment tout est déjà écrit dans les sources. C'est bien d'indiquer
+  # une courte description des actions menées dedans pour garder une doc claire.
+  # ----------------------------------------------------------------------------
+  
+  - name: stg_raw__sales
+    description: "Renommage de l'id des produits"
+
+  - name: stg_raw__product
+    description: "Cast et renommage du prix des produits"
+
+  - name: stg_raw__ship
+    description: "Renommage des colonnes de coûts"
+    
+  # ----------------------------------------------------------------------------
+  # B. Modèles Intermédiaires (calculs / aggrégations / jointures nécessaires)
+  # ----------------------------------------------------------------------------
+  
+  - name: int_sales_margin
+    description: "Calcul de la marge ligne à ligne (avec Sales et Product)."
+    columns:
+      - name: margin
+        description: "Revenue - Purchase Cost"
+      - name: purchase_cost
+        description: "Coût d'achat (quantité * prix d'achat)"
+
+  - name: int_orders_margin
+    description: "Agrégation de la marge au niveau de la commande (orders_id)"
+    columns:
+      - name: orders_id
+        tests:
+          - unique
+          - not_null
+      - name: margin
+        description: "Somme des marges de tous les produits de la commande"
+
+  - name: int_orders_operational
+    description: "Marge opérationnelle (marge - coûts logistiques)"
+    columns:
+      - name: orders_id
+        tests:
+          - unique
+          - not_null              
+      - name: operational_margin
+        description: "Marge + shipping fee - (log cost + ship cost)"
+
+  # ----------------------------------------------------------------------------
+  # C. Modèles Marts (Finance ici)
+  # C'est la table finale utilisée dans le dashboard, comme Power BI.
+  # La doc est importante car elle sera consultée par les utilisateurs du Dashboard.
+  # ----------------------------------------------------------------------------
+
+  - name: finance_days
+    description: "KPIs financiers agrégés par jour, table principale pour le dashboard financier"
+    columns:
+      - name: date_date
+        description: "Journée d'activité"
+        # C'est la table finale, il est capital de s'assurer de la qualité des données
+        tests:
+          - unique
+          - not_null
+      
+      - name: nb_transactions
+        description: "Nombre de commandes uniques par jour"
+      
+      - name: average_basket
+        description: "Panier moyen (revenue / nb transactions)"
+        
+      - name: operational_margin
+        description: "Marge opérationnelle totale journalière"
