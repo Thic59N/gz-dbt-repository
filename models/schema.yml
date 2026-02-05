@@ -184,3 +184,14 @@ models:
   - name: int_campaigns
   
     description: "accumulation des ads (adwords + bing + criteo + facebook)"
+    columns:
+      - name: date_date
+        description: dates des campagnes
+
+    tests:
+        # La combinaison des clés uniques de la date + clé de la campagne doit être unique
+      - unique:
+          column_name: "(date_date || '-' || campaign_key)"
+      - not_null:
+          column_name: "(date_date || '-' || campaign_key)"
+
