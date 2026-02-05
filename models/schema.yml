@@ -176,6 +176,17 @@ models:
       - name: operational_margin
         description: "Marge opérationnelle totale journalière"
 
+  # ----------------------------------------------------------------------------
+  - name: finance_campaigns_days
+    description: "KPIs financiers agrégés par jour par campagnes"
+    columns:
+      - name: date_date
+        description: "Journée d'activité"
+        # C'est la table finale, il est capital de s'assurer de la qualité des données
+        tests:
+          - unique
+          - not_null
+
 
   # ----------------------------------------------------------------------------
   # B. Modèles Intermédiaires campaigns (accumulation de adwords + bing + criteo + facebook)
