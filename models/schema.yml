@@ -187,6 +187,10 @@ models:
     columns:
       - name: date_date
         description: dates des campagnes
+      - name: ads_cost
+        tests:
+        - not_null
+
 
     tests:
         # La combinaison des clés uniques de la date + clé de la campagne doit être unique
@@ -194,4 +198,4 @@ models:
           column_name: "(date_date || '-' || campaign_key)"
       - not_null:
           column_name: "(date_date || '-' || campaign_key)"
-
+      
