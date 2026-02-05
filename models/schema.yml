@@ -51,6 +51,38 @@ sources:
               - unique
               - not_null
 
+      # --- Table 4 : adwords ---
+      - name: adwords #alias
+        identifier: raw_gz_adwords
+        description: cout marketing de adwords
+        # columns:
+        #   - name : orders_id
+        #     description: id des produits dans products
+        #     # tests:
+        #     #   - unique
+        #     #   - not_null
+
+      # --- Table 5 : bing ---
+      - name: bing #alias
+        identifier: raw_gz_bing
+        description: cout marketing de bing
+        # columns:
+        #   - name : orders_id
+        #     description: id des produits dans products
+        #     tests:
+        #       - unique
+        #       - not_null
+
+
+      # --- Table 5 : criteo ---
+      - name: criteo #alias
+        identifier: raw_gz_criteo
+        description: cout marketing de criteo
+
+      # --- Table 5 : facebook ---
+      - name: facebook #alias
+        identifier: raw_gz_facebook
+        description: cout marketing de facebook
 
 # ==============================================================================
 # 2. MODÈLES
