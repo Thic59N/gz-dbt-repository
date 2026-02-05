@@ -178,7 +178,7 @@ models:
 
 
   # ----------------------------------------------------------------------------
-  # B. Modèles Intermédiaires campaigns (calculs / aggrégations / jointures nécessaires)
+  # B. Modèles Intermédiaires campaigns (accumulation de adwords + bing + criteo + facebook)
   # ----------------------------------------------------------------------------
 
   - name: int_campaigns
@@ -199,3 +199,15 @@ models:
       - not_null:
           column_name: "(date_date || '-' || campaign_key)"
       
+
+  # ----------------------------------------------------------------------------
+  # B. Modèles Intermédiaires campaigns days (agreggation des campaigns par jour)
+  # ----------------------------------------------------------------------------
+
+  - name: int_campaigns_day
+  
+    description: "aggregation des pub"
+    columns:
+      - name: ads_cost
+        tests:
+        - not_null
